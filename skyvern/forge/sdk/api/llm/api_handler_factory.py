@@ -401,6 +401,12 @@ class LLMAPIHandlerFactory:
         if llm_config.reasoning_effort is not None:
             params["reasoning_effort"] = llm_config.reasoning_effort
 
+        if  settings.ENABLE_OLLAMA:
+            params["api_base"] = settings.OLLAMA_API_BASE
+            params["input_cost_per_token"] = 0.
+            params["output_cost_per_token"] = 0.
+            #params["format"] = "json"
+
         return params
 
     @classmethod

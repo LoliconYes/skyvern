@@ -323,6 +323,7 @@ async def _create_headless_chromium(
 
     browser_artifacts = BrowserContextFactory.build_browser_artifacts(har_path=browser_args["record_har_path"])
     browser_context = await playwright.chromium.launch_persistent_context(**browser_args)
+    await browser_context.grant_permissions(["clipboard-write", "clipboard-read"]) #YZ add clipboard access
     return browser_context, browser_artifacts, None
 
 
@@ -346,6 +347,7 @@ async def _create_headful_chromium(
     )
     browser_artifacts = BrowserContextFactory.build_browser_artifacts(har_path=browser_args["record_har_path"])
     browser_context = await playwright.chromium.launch_persistent_context(**browser_args)
+    await browser_context.grant_permissions(["clipboard-write", "clipboard-read"]) #YZ add clipboard access
     return browser_context, browser_artifacts, None
 
 

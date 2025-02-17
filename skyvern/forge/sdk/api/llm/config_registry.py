@@ -53,6 +53,7 @@ if not any(
         settings.ENABLE_BEDROCK,
         settings.ENABLE_GEMINI,
         settings.ENABLE_NOVITA,
+        settings.ENABLE_OLLAMA,
     ]
 ):
     raise NoProviderEnabledError()
@@ -510,5 +511,26 @@ if settings.ENABLE_NOVITA:
                 api_version=settings.NOVITA_API_VERSION,
                 model_info={"model_name": "openai/meta-llama/llama-3-70b-instruct"},
             ),
+        ),
+    )
+
+
+if settings.ENABLE_OLLAMA:
+    LLMConfigRegistry.register_config(
+        "QWEN2.5_32B_INSTRUCT_32K",
+        LLMConfig(
+            "ollama/qwen2.5:32b-instruct-ctx32k",
+            ["OLLAMA_API_BASE"],
+            supports_vision=False,
+            add_assistant_prefix=False,
+        ),
+    )
+    LLMConfigRegistry.register_config(
+        "DEEPSEEK_R1_32B",
+        LLMConfig(
+            "ollama/deepseek-r1:32b-ctx32k",
+            ["OLLAMA_API_BASE"],
+            supports_vision=True,
+            add_assistant_prefix=False,
         ),
     )

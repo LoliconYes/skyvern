@@ -108,6 +108,7 @@ class Settings(BaseSettings):
     ENABLE_AZURE_O3_MINI: bool = False
     ENABLE_BEDROCK: bool = False
     ENABLE_GEMINI: bool = False
+    ENABLE_OLLAMA: bool = False
     # OPENAI
     OPENAI_API_KEY: str | None = None
     # ANTHROPIC
@@ -132,6 +133,9 @@ class Settings(BaseSettings):
 
     # GEMINI
     GEMINI_API_KEY: str | None = None
+
+    # OLLAMA
+    OLLAMA_API_BASE: str | None = "http://127.0.0.1:11434"
 
     # NOVITA AI
     ENABLE_NOVITA: bool = False

@@ -36,8 +36,8 @@ services:
       - DATABASE_STRING=postgresql+psycopg://skyvern:skyvern@postgres:5432/skyvern
       - BROWSER_TYPE=chromium-headful
       - ENABLE_OPENAI=true
-      - LLM_KEY=OPENAI_GPT4O
-      - OPENAI_API_KEY=<your_openai_key>
+      # LLM_KEY=OPENAI_GPT4O
+      # OPENAI_API_KEY=<your_openai_key>
       # If you want to use other LLM provider, like azure and anthropic:
       # - ENABLE_ANTHROPIC=true
       # - LLM_KEY=ANTHROPIC_CLAUDE3.5_SONNET
@@ -71,6 +71,9 @@ services:
       # - AWS_REGION=us-west-2                         # Replace this with a different AWS region, if you desire
       # - AWS_ACCESS_KEY_ID=FILL_ME_IN_PLEASE
       # - AWS_SECRET_ACCESS_KEY=FILL_ME_IN_PLEASE
+      # OLLAMA Support:
+      - ENABLE_OLLAMA=true
+      - OLLAMA_API_BASE=http://127.0.0.1:11434
     depends_on:
       postgres:
         condition: service_healthy

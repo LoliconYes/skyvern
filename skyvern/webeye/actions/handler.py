@@ -1428,7 +1428,14 @@ async def chain_click(
         await locator.click(timeout=timeout)
 
         LOG.info("Chain click: main element click succeeded", action=action, locator=locator)
-        return [ActionSuccess()]
+
+        #YZ: get clipboard element.
+        clipboard_element = await page.evaluate("navigator.clipboard.readText()")
+        LOG.debug("Trying get clipboard-element:", element=clipboard_element)
+        if clipboard_element != "":
+            data = {"clipboard-element": str(clipboard_element)}
+
+        return [ActionSuccess(data=data)]
 
     except Exception as e:
         action_results: list[ActionResult] = [ActionFailure(FailToClick(action.element_id, msg=str(e)))]
@@ -2736,6 +2743,41 @@ def get_checkbox_id_in_label_children(scraped_page: ScrapedPage, element_id: str
 
     return None
 
+from skyvern.forge.sdk.models import Step, StepStatus
+async def get_clipboard_information_for_task(task: Task) -> list:
+    """
+    YZ: get the clipboard information.
+    """
+    clipboard_information = []
+    steps = await app.DATABASE.get_task_steps(
+        task_id=task.task_id,
+        organization_id=task.organization_id,
+    )
+    for step in reversed(steps):
+        if step.status != StepStatus.completed:
+            continue
+        if not step.output or not step.output.actions_and_results:
+            continue
+        for action, action_results in step.output.actions_and_results:
+            if action.action_type != ActionType.CLICK:
+                continue
+
+            for action_result in action_results:
+                if action_result.success and isinstance(action_result.data, dict) and 'clipboard-element' in action_result.data.keys():
+                    LOG.debug(
+                        "Extracted clipboard information for task",
+                        step_id=step.step_id,
+                        reasoning=action.reasoning,
+                        clipboard_element=action_result.data['clipboard-element'],
+                    )
+                    clipboard_information.append({'step-reasoning':action.reasoning, 'clipboard-element': action_result.data['clipboard-element']})
+
+    if clipboard_information == 0:
+        LOG.warning(
+            "Doesn't find clipboard information for task",
+            task_id=task.task_id,
+        )
+    return clipboard_information
 
 async def extract_information_for_navigation_goal(
     task: Task,
@@ -2755,6 +2797,11 @@ async def extract_information_for_navigation_goal(
 
     scraped_page_refreshed = await scraped_page.refresh()
 
+    # YZ: add the clipboard information.
+    LOG.debug("Add the clipboard information")
+    clipboard_information = await get_clipboard_information_for_task(task)
+    LOG.debug("The clipboard information", clipboard_information=clipboard_information)
+
     context = ensure_context()
     extract_information_prompt = prompt_engine.load_prompt(
         prompt_template,
@@ -2767,6 +2814,7 @@ async def extract_information_for_navigation_goal(
         extracted_text=scraped_page_refreshed.extracted_text,
         error_code_mapping_str=(json.dumps(task.error_code_mapping) if task.error_code_mapping else None),
         local_datetime=datetime.now(context.tz_info).isoformat(),
+        clipboard_information={json.dumps(clipboard_information) if len(clipboard_information) > 0 else None}  # YZ: add the clipboard information.
     )
 
     json_response = await app.LLM_API_HANDLER(
