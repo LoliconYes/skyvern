@@ -520,17 +520,29 @@ if settings.ENABLE_OLLAMA:
         "QWEN2.5_32B_INSTRUCT_32K",
         LLMConfig(
             "ollama/qwen2.5:32b-instruct-ctx32k",
-            ["OLLAMA_API_BASE"],
+            ["OLLAMA_API_KEY"],
             supports_vision=False,
             add_assistant_prefix=False,
+            litellm_params=LiteLLMParams(
+                api_base=settings.OLLAMA_API_BASE,
+                api_key=settings.OLLAMA_API_KEY,
+                api_version="beta",
+                model_info={"model_name": "ollama/qwen2.5:32b-instruct-ctx32k"},
+            ),
         ),
     )
     LLMConfigRegistry.register_config(
         "DEEPSEEK_R1_32B",
         LLMConfig(
             "ollama/deepseek-r1:32b-ctx32k",
-            ["OLLAMA_API_BASE"],
-            supports_vision=True,
+            ["OLLAMA_API_KEY"],
+            supports_vision=False,
             add_assistant_prefix=False,
+            litellm_params=LiteLLMParams(
+                api_base=settings.OLLAMA_API_BASE,
+                api_key=settings.OLLAMA_API_KEY,
+                api_version="beta",
+                model_info={"model_name": "ollama/deepseek-r1:32b-ctx32k"},
+            ),
         ),
     )

@@ -135,6 +135,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str | None = None
 
     # OLLAMA
+    OLLAMA_API_KEY: str | None = None
     OLLAMA_API_BASE: str | None = "http://127.0.0.1:11434"
 
     # NOVITA AI
